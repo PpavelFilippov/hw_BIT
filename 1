@@ -1,0 +1,96 @@
+#pragma warning(disable:4996)
+#include<stdio.h>
+#include<locale.h>
+#include <math.h>
+#define _USE_MATH_DEFINES
+//typedef unsigned char integer_t;
+//typedef unsigned short integer_t;
+typedef unsigned  long integer_t;
+typedef unsigned long long MaxInt;
+//typedef unsigned int integer_t;
+////////////////////////////////////////////////////////////////////////////////
+/**
+* Печатает число максимальное для заданного типа integer_t.
+*/
+integer_t dor() {
+    return (1 << (sizeof(integer_t) * 8 - 1)) + ((1 << (sizeof(integer_t) * 8 - 1)) - 1);
+}
+////////////////////////////////////////////////////////////////////////////////
+/**
+ Печатает число (a) в двоичной системе счисления.
+*/
+void PrintBin(integer_t a) {
+    for (int i = sizeof(integer_t) * 8 - 1; i >= 0; i--) {
+        MaxInt x = a & (1 << i);
+
+        if (x != 0) {
+            x = 1;
+        }
+        if ((i + 1) % 8 == 0) {
+
+            printf(" %u", x);
+        }
+        else {
+            printf("%u", x);
+        }
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+/**
+ Выводит длину числа (a) по заданной системе счисления.
+
+ radix - заданная система счисления.
+*/
+int len(integer_t a, int radix) {
+    if (a == 0) return 1;
+    int c = 0;
+    while (a != 0) {
+        a /= radix;
+        c++;
+    }
+    return c;
+}
+////////////////////////////////////////////////////////////////////////////////
+/**
+  Функция меняющая биты числа (a)
+  (z) - получившееся число.
+  Первый цикл пробегает по байтам, в которых есть значащие цифры.
+  Второй цикл (вложенный) пробегается по битам выбранного байта, меняя биты местами.
+*/
+MaxInt Procces(integer_t a) {
+    int l = len(a, 2) + 1;
+    MaxInt z = 0;
+    for (int y = 0; y < sizeof(integer_t) * 8; y += 8){
+        for (int i = 0; i < 4; i++) {
+            integer_t f = a & (1 << (i + y)), s = a & (1 << (7 - i + y));
+            f = f << ((7 - 2 * i));
+            z += f;
+            s = s >> (7 - 2 * i);
+            z += s;
+        }
+        }
+    return z;
+}
+///////////////////////////////////////////////////////////////////////////////
+int main() {
+    MaxInt g = 1, a = 1;
+    setlocale(LC_CTYPE, "Russian");
+    printf("\nЗадание BIT-1: Реверс битов");
+    while (g != 0) {
+        printf("\n\nВведите число (меньшее %u): ", dor());
+        scanf("%u", &g);
+        if (g <= dor()) {
+            integer_t max_num = g;
+            a = Procces(g);
+            if (g < a) max_num = a;
+            printf("\nВы ввели : %*u", len(max_num, 10), g);
+            printf(" = 0x%0*X =", len(max_num, 16), g);
+            PrintBin(g);
+            printf("\nРезультат: %*u", len(max_num, 10), a);
+            printf(" = 0x%0*X =", len(max_num, 16), a);
+            PrintBin(a);
+        }
+    }
+
+    return 0;
+}
